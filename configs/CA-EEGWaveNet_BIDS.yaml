@@ -1,0 +1,87 @@
+# pytorch_lightning==2.0.0
+seed_everything: 42
+trainer:
+  accelerator: auto
+  strategy:  auto
+  devices: 1
+  num_nodes: 1
+  precision: 32
+  logger: false
+  callbacks:
+  - class_path: lightning.pytorch.callbacks.ModelCheckpoint
+    init_args:
+      save_last: true
+      save_on_train_epoch_end: true  
+  fast_dev_run: false
+  max_epochs: null
+  min_epochs: null
+  max_steps: -1
+  min_steps: null
+  max_time: null
+  limit_train_batches: 1000
+  limit_val_batches: null
+  limit_test_batches: null
+  limit_predict_batches: null
+  overfit_batches: 0.0
+  val_check_interval: null
+  check_val_every_n_epoch: null
+  num_sanity_val_steps: 0
+  log_every_n_steps: 10
+  enable_checkpointing: null
+  enable_progress_bar: null
+  enable_model_summary: null
+  accumulate_grad_batches: 1
+  gradient_clip_val: null
+  gradient_clip_algorithm: null
+  deterministic: false
+  benchmark: null
+  inference_mode: true
+  use_distributed_sampler: true
+  profiler: null
+  detect_anomaly: false
+  barebones: false
+  plugins: null
+  sync_batchnorm: true
+  reload_dataloaders_every_n_epochs: 0
+  default_root_dir: null
+model:
+  class_path: models.ca.CAModel
+  # base_model: <model_path>
+  init_args:
+    lr: 0.00055299
+    encoder:
+      class_path: models.multieegwavenet.MultiEEGWaveNet
+      init_args:
+        size_output: 1024
+    fusion:
+      class_path: models.fusion.CircularEncodingLayer
+      init_args:
+        size: 1024
+        patients: 100
+        datasets: 3
+    memory:
+      class_path: models.tcn.TCN
+      init_args:
+        size_input: 1024
+        size_mem: 14
+        size_embed: 8
+        size_output: 1024
+        kernel_size: 6
+        dropout: 0.4
+data:
+  class_path: datasets.bids.BIDSEEGData
+  init_args:
+    folders: 
+      - <dataset_path>
+    train_patients:
+      - null
+    val_patients:
+      - [""]
+    test_patients:
+      - [""]
+    batch_size: 16
+    segment_n: 14
+    segment_size: 7500
+    stride: 1000
+    num_workers: 1
+    patients_per_batch: 1
